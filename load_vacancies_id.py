@@ -18,7 +18,6 @@ def getPageJSON(date_from=None, date_to=None, area=1, page=0, per_page=100, url=
     area - where vacancies are published
     """
 
-    requests.get()
     # header for browser
     headers = {"User-agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36"}
 
