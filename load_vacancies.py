@@ -1,5 +1,4 @@
 from asyncio.tasks import FIRST_EXCEPTION
-from asyncio.windows_events import NULL
 import requests
 import pickle
 import logging
