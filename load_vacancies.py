@@ -1,11 +1,8 @@
 from asyncio.tasks import FIRST_EXCEPTION
 import requests
 import pickle
-import logging
 
 from concurrent.futures import ThreadPoolExecutor, wait, FIRST_EXCEPTION
-from lxml.html import fromstring
-from itertools import cycle
 from time import sleep
 
 # hh.ru API domain
