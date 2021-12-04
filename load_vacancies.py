@@ -3,7 +3,7 @@ import requests
 import pickle
 
 from concurrent.futures import ThreadPoolExecutor, wait, FIRST_EXCEPTION
-from time import sleep
+from time import sleep, time
 
 # hh.ru API domain
 main_domain = "https://api.hh.ru/"
@@ -30,6 +30,7 @@ def getVacancies(ids, prev_vcs):
     print("Started future creation loop")
     futures = []
     with ThreadPoolExecutor() as executor:
+
         while i < len(ids):
             try:
                 futures.append(
@@ -39,14 +40,6 @@ def getVacancies(ids, prev_vcs):
                 print(f"Got exception:\n{e}\nBreaking future creation loop...")
                 break
 
-            # print(f"Got response on id {ids[i]}")
-            # if res.status_code == 200:
-            #     print("Got nice reponse, processing...")
-            #     vcs.append(res.json())
-            # elif res.status_code == 403:
-            #     print("Got 403 status code")
-            #     return vcs
-            
             sleep(0.1)
             i+=1
     
@@ -54,7 +47,8 @@ def getVacancies(ids, prev_vcs):
     wait(futures, return_when=FIRST_EXCEPTION)
     print("Done!")
     return vcs
-if __name__ == '__main__':
+
+def main():
     print("Loading ids...")
     with open("02_12_2021_vacancies_id", "rb") as inp:
         ids = pickle.load(inp)
@@ -74,3 +68,6 @@ if __name__ == '__main__':
 
     with open("02_12_2021_vacancies", "wb") as out:
         pickle.dump(vcs, out)
+
+if __name__ == '__main__':
+    main()

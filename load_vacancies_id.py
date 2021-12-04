@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from time import time
 import requests
 import logging
 import pickle
@@ -79,7 +80,10 @@ def getVacanciesID(area=1):
         ids[i] = ids[i].split('/')[-1]
     return ids
 
-if __name__ == "__main__":
+def main():
     data = getVacanciesID()
     with open("02_12_2021_vacancies_id", "wb") as out:
         pickle.dump(data, out)
+
+if __name__ == "__main__":
+    main()
