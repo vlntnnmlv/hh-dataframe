@@ -41,28 +41,29 @@ def getPageJSON(date_from=None, date_to=None, area=1, page=0, per_page=100, url=
 
 def getVacanciesID(area=1):
     """ Returns list of all vacancies ids in given area """
-    ids = []
+    ids = set()
     start_date = (datetime.now() - timedelta(days=30)).replace(day = 14)
     end_date = datetime.now()
     step = timedelta(minutes=30)
     i = 0
     logging.info("Started request loop")
+
     while start_date + (i + 1) * step <= end_date:
         logger.info(
             f'got response on dates: {(start_date + i * step).isoformat()} - {(start_date + (i + 1) * step).isoformat()}'
             )
         r = getPageJSON((start_date + i * step).isoformat(), (start_date + (i + 1) * step).isoformat(), area=area)
-        if 'errors' in r.keys():
+        if 'errors' in r:
             logger.error('Unexpected response from the server')
             logger.error(r)
             break
-        if 'items' in r.keys():
+        if 'items' in r:
             logger.info('extracting alternate urls...')
             new_ids = [item['alternate_url'] for item in r['items']]
-            ids += new_ids
+            ids.update(new_ids)
             logger.info(f'added {len(new_ids)} new alternate urls')
 
-        if 'pages' in r.keys():
+        if 'pages' in r and r['pages'] > 1:
             logger.info('got more than one page, extracting remained alternate urls...')
             for j in range(1, r['pages']):
                 r_p = getPageJSON(
@@ -72,10 +73,11 @@ def getVacanciesID(area=1):
                     )
                 if 'items' in r_p.keys():
                     new_ids = [item['alternate_url'] for item in r_p['items']]
-                    ids += new_ids
+                    ids.update(new_ids)
                     logger.info(f'added {len(new_ids)} new alternate urls')
         i += 1
     
+    ids = list(ids)
     for i in range(len(ids)):
         ids[i] = ids[i].split('/')[-1]
     return ids
