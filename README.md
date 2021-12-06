@@ -14,5 +14,6 @@ ___
 
 ## Dependencies
 
- - [windscribe](https://windscribe.com/)
+ - [windscribe](https://windscribe.com/download)
+
  VPN Client. Used for IP changing when requests limit is reached.
