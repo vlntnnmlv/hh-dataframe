@@ -1,5 +1,6 @@
 import pickle
 import pandas as pd
+import re
 
 def toDataFrame(raw_data=None, filename=None):
     if filename:
@@ -31,26 +32,37 @@ def toDataFrame(raw_data=None, filename=None):
     df.working_time_intervals = df.working_time_intervals.apply(lambda x : [e['id'] for e in x] if x else None)
     df.working_time_modes = df.working_time_modes.apply(lambda x : [e['id'] for e in x] if x else None)
 
+    df['professional_role'] = df.professional_roles.apply(lambda x : [e['id'] for e in x] if x else None)
+    df.description = df.description.apply(lambda x : re.sub(re.compile('<.*?>|;|,'), '', x) if x else None)
+    
+    df.driver_license_types = df.driver_license_types.apply(lambda x : [e['id'] for e in x] if x else None)
+    
     df.index = df.id
-
     # drop odd columns
     df = df.drop(
         [
             "id",
-            "relations",
-            "premium",
-            "allow_messages",
-            "contacts",
             "test",
             "area",
-            "insider_interview",
-            "department",
             "code",
+            "hidden",
+            "premium",
+            "contacts",
+            "relations",
+            "department",
+            "allow_messages",
+            "insider_interview",
+            "professional_roles",
+            "immediate_redirect_url",
+            "quick_responses_allowed",
             "branded_description",
-            "negotiations_url",
             "suitable_resumes_url",
             "apply_alternate_url",
-            "alternate_url"
+            "negotiations_url",
+            "alternate_url",
+            "response_url",
+            "salary",
+            "site"
             ],
                 axis=1)
 
