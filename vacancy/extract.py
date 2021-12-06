@@ -13,8 +13,7 @@
 from asyncio.tasks import FIRST_EXCEPTION
 from concurrent.futures import ThreadPoolExecutor, wait
 from datetime import datetime, timedelta, date
-from time import time
-from utility import changeIP, timestamp
+from vacancy.utility import changeIP, timestamp
 
 import requests
 import logging
@@ -147,10 +146,10 @@ def getVacanciesID(area, backstep=30, forwardstep=None, timestep=30, save=False)
 
 ### VACANCY
 
-def getVacancy(id, vcs, executor):
-    r = requests.get(f"{main_domain}vacancies/{id}")
+def getVacancy(id, i, vcs, executor):
+    r = requests.get(f"{main_domain}vacancies/{id}", timeout=15)
     if r.status_code != 200:
-        print(f"Got bad response on id {id}. Status code {r.status_code}")
+        print(f"/{i}/ Got bad response on id {id}. Status code {r.status_code}")
         print("Trying to change IP...")
         if not changeIP():
             print("Could not change IP; Exiting.")
@@ -158,9 +157,8 @@ def getVacancy(id, vcs, executor):
         else:
             getVacancy(id, vcs, executor)
     else:
-        print(f"Got nice response on id {id}, processing...")
+        print(f"/{i}/ Got nice response on id {id}, processing...")
         vcs.append(r.json())
-
 
 def getVacancies(ids):
     vcs = []
@@ -168,12 +166,13 @@ def getVacancies(ids):
 
     print("Started future creation loop.")
     with ThreadPoolExecutor() as executor:
-        for id in ids:
+        for i, id in enumerate(ids):
             try:
                 futures.append(
                     executor.submit(
                         getVacancy,
                         id,
+                        i,
                         vcs,
                         executor
                     )
