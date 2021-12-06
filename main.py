@@ -4,15 +4,20 @@ import pickle
 from vacancy.extract import getVacanciesID, getVacancies
 from vacancy.transform import toDataFrame
 from vacancy.utility import timestamp
+
+# !!!
+import argparse
+# !!!
+
 import os
 
 def main():
-    area = 14
+    area = 1
     backstep = 30
     print("Extracting ids...")
-    if (os.path.isfile(f"./{timestamp()}_{area}_{backstep}_ids.pickle")):
+    if (os.path.isfile(f"./vacancy/{timestamp()}_{area}_{backstep}_ids.pickle")):
         print("Found cached ids")
-        with open(f"./{timestamp()}_{area}_{backstep}_ids.pickle", "rb") as inp:
+        with open(f"./vacancy/{timestamp()}_{area}_{backstep}_ids.pickle", "rb") as inp:
             ids = pickle.load(inp)
     else:
         ids = getVacanciesID(area=area, backstep=backstep, save=True)
