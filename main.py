@@ -1,22 +1,29 @@
-from datetime import time
-from os import times
 import pickle
-from vacancy.extract import getVacanciesID, getVacancies
+import os
+from vacancy.extract import getVacanciesID, getVacancies, updateAreas
 from vacancy.transform import toDataFrame
 from vacancy.utility import timestamp
-
-# !!!
 import argparse
-# !!!
-
 import os
 
 def main():
-    area = 1
-    backstep = 30
+
+    parser = argparse.ArgumentParser(description="Create .csv dataset on given area")
+    parser.add_argument("area", metavar="area", type=str)
+    parser.add_argument("backstep", metavar="backstep", type=int)
+    args = parser.parse_args()
+
+    areas = updateAreas(save=True)
+    try:
+        area = areas[args.area]
+    except KeyError as k:
+        print(f"{args.area} nor found in areas dictionary. Area is set to 1")
+        area = 1
+
+    backstep = args.backstep
     print("Extracting ids...")
     if (os.path.isfile(f"./vacancy/{timestamp()}_{area}_{backstep}_ids.pickle")):
-        print("Found cached ids")
+        print("Found cached ids.")
         with open(f"./vacancy/{timestamp()}_{area}_{backstep}_ids.pickle", "rb") as inp:
             ids = pickle.load(inp)
     else:

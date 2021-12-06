@@ -18,7 +18,7 @@ from vacancy.utility import changeIP, timestamp
 import requests
 import logging
 import pickle
-
+import os
 # hh.ru API domain
 main_domain = "https://api.hh.ru/"
 
@@ -41,6 +41,8 @@ def getPage(date_from=None, date_to=None, area=1, page=0, per_page=100, url=None
 
     # request params
     params = {
+            "professional_role" : 96,
+            "only_with_salary" : True,
             "page" : page,
             "per_page" : per_page
     }
@@ -186,3 +188,41 @@ def getVacancies(ids):
     print("Done!")
 
     return vcs
+
+### UTILITY
+
+def updateAreas(save=False):
+
+    if os.path.isfile("areas_dicitonary.pickle"):
+        with open("areas_dictionary.pickle", "rb") as inp:
+            return pickle.load(inp)
+
+    def extractAreasID(area, areas_dict):
+        if "name" in area and "id" in area:
+            areas_dict[area["name"]] = area["id"]
+        if "areas" not in area:
+            return
+        else:
+            for area in area["areas"]:
+                extractAreasID(area, areas_dict)
+
+    print("Updating areas dictionary...")
+    r = requests.get("https://api.hh.ru/areas")
+    res = {}
+    if r.status_code != 200:
+        print("Got bad response on areas. Trying to change ip...")
+        if not changeIP():
+            print("Could not change IP. Exiting...")
+            return
+        else:
+            updateAreas()
+    else:
+        areas = r.json()
+        for area in areas:
+            extractAreasID(area, res)
+    
+    if save:
+        with open("areas_dictionary.pickle", "wb") as out:
+            pickle.dump(res, out)
+
+    return res
